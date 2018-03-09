@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="io.github.agaghd.markdownview.MainActivity">
+    tools:context="io.github.agaghd.markdownview.activities.MainActivity">
 
     <Button
         android:layout_width="match_parent"

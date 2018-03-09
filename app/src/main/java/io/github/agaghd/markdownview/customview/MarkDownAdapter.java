@@ -1,4 +1,4 @@
-package io.github.agaghd.markdownview;
+package io.github.agaghd.markdownview.customview;
 
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -9,6 +9,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.github.agaghd.markdownview.R;
+import io.github.agaghd.markdownview.utils.MarkDown;
 
 /**
  * author : wjy
@@ -60,8 +63,19 @@ public class MarkDownAdapter extends RecyclerView.Adapter<MarkDownAdapter.MarkDo
      * @param data 添加的数据集合
      */
     public void addData(List<String> data) {
+        int start = sourceList.size();
         sourceList.addAll(data);
-        notifyItemChanged(sourceList.size() - 1);
+        notifyItemRangeChanged(start, data.size());
+    }
+
+    /**
+     * 添加单条数据的方法
+     *
+     * @param data 添加的单条数据
+     */
+    public void addData(String data) {
+        sourceList.add(data);
+        notifyItemInserted(sourceList.size()-1);
     }
 
     class MarkDownAdapterViewHolder extends RecyclerView.ViewHolder {

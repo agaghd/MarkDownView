@@ -2,7 +2,9 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/common_padding_screen"
+    android:paddingEnd="@dimen/common_padding_screen"
     tools:text="@string/app_name">
 
 </TextView>

@@ -2,4 +2,6 @@
     <string name="app_name">MarkDownView</string>
     <string name="btn1_text">解析source.md</string>
     <string name="btn2_text">自定义测试输入</string>
+    <string name="btn_parse">解析输入的MarkDown语句</string>
+    <string name="markdown_et_hint">请输入要解析的MarkDown语句</string>
 </resources>
