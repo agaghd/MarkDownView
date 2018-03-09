@@ -1,10 +1,16 @@
 package io.github.agaghd.markdownview.activities;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,12 +46,59 @@ public class MarkDownDisplayActivity extends AppCompatActivity {
     }
 
     private void parseSourceDotMD() {
-        // TODO: 2018/3/9 解析source.md
-        List<String> fakeData = new ArrayList<>();
-        fakeData.add("Hello MarkDown");
-        fakeData.add("Hello Everyone");
-        markDownView.setData(fakeData);
-        markDownView.addData("wtf");
+        //解析source.md
+        AsyncTask<Object, Object, List<String>> asyncTask = new AsyncTask<Object, Object, List<String>>() {
+
+            @Override
+            protected List<String> doInBackground(Object... params) {
+                List<String> data = new ArrayList<>();
+                InputStream is = null;
+                BufferedReader reader = null;
+                try {
+                    is = MarkDownDisplayActivity.this.getResources().getAssets().open("source.md");
+                    reader = new BufferedReader(new InputStreamReader(is));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        data.add(line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (reader != null) {
+                        try {
+                            reader.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Toast.makeText(
+                                    MarkDownDisplayActivity.this,
+                                    "读取sorce.md出现错误：" + e.getMessage(),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    if (is != null) {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Toast.makeText(
+                                    MarkDownDisplayActivity.this,
+                                    "读取sorce.md出现错误：" + e.getMessage(),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+                return data;
+            }
+
+            @Override
+            protected void onPostExecute(List<String> strings) {
+                super.onPostExecute(strings);
+                if (strings != null && strings.size() > 0) {
+                    markDownView.setData(strings);
+                }
+            }
+        };
+        asyncTask.execute();
     }
 
     /**

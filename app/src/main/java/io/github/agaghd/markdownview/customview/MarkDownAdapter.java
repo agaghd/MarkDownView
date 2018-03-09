@@ -38,6 +38,8 @@ public class MarkDownAdapter extends RecyclerView.Adapter<MarkDownAdapter.MarkDo
             String markDownStr = sourceList.get(position);
             if (!TextUtils.isEmpty(markDownStr)) {
                 MarkDown.setMarkDownText(markDownStr, holder.itemTv);
+            } else {
+                MarkDown.setMarkDownText("", holder.itemTv);
             }
         }
     }
@@ -75,7 +77,7 @@ public class MarkDownAdapter extends RecyclerView.Adapter<MarkDownAdapter.MarkDo
      */
     public void addData(String data) {
         sourceList.add(data);
-        notifyItemInserted(sourceList.size()-1);
+        notifyItemInserted(sourceList.size() - 1);
     }
 
     class MarkDownAdapterViewHolder extends RecyclerView.ViewHolder {
