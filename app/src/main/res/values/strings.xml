@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MarkDownView</string>
+    <string name="btn1_text">解析source.md</string>
+    <string name="btn2_text">自定义测试输入</string>
 </resources>
