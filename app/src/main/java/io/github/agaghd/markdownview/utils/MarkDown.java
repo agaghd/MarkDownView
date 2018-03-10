@@ -57,6 +57,11 @@ public class MarkDown {
          */
         public static final Pattern UL = Pattern.compile("^-.*$");
 
+        /**
+         * MarkDown 图片和超链接URL的简单正则
+         */
+        public static final Pattern URL = Pattern.compile("\\(.*\\)");
+
         private Patterns() {
         }
     }
