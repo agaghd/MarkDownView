@@ -22,8 +22,10 @@ import io.github.agaghd.markdownview.utils.MarkDown;
 public class MarkDownAdapter extends RecyclerView.Adapter<MarkDownAdapter.MarkDownAdapterViewHolder> {
 
     private List<String> sourceList;//数据来源：markDown语句字符串
+    private int[] olNumber;//有序列表的序号, 基本类型不能传递引用，所以使用数组
 
     public MarkDownAdapter() {
+        olNumber = new int[]{1};
         sourceList = new ArrayList<>();
     }
 
@@ -37,9 +39,9 @@ public class MarkDownAdapter extends RecyclerView.Adapter<MarkDownAdapter.MarkDo
         if (sourceList != null && sourceList.size() > position) {
             String markDownStr = sourceList.get(position);
             if (!TextUtils.isEmpty(markDownStr)) {
-                MarkDown.setMarkDownText(markDownStr, holder.itemTv);
+                MarkDown.setMarkDownText(markDownStr, holder.itemTv, olNumber);
             } else {
-                MarkDown.setMarkDownText("", holder.itemTv);
+                MarkDown.setMarkDownText("", holder.itemTv, olNumber);
             }
         }
     }
@@ -55,6 +57,7 @@ public class MarkDownAdapter extends RecyclerView.Adapter<MarkDownAdapter.MarkDo
      * @param sourceList 数据源
      */
     public void setData(List<String> sourceList) {
+        olNumber = new int[]{1};
         this.sourceList = sourceList;
         notifyDataSetChanged();
     }
@@ -65,6 +68,7 @@ public class MarkDownAdapter extends RecyclerView.Adapter<MarkDownAdapter.MarkDo
      * @param data 添加的数据集合
      */
     public void addData(List<String> data) {
+        olNumber = new int[]{1};
         int start = sourceList.size();
         sourceList.addAll(data);
         notifyItemRangeChanged(start, data.size());
@@ -76,6 +80,7 @@ public class MarkDownAdapter extends RecyclerView.Adapter<MarkDownAdapter.MarkDo
      * @param data 添加的单条数据
      */
     public void addData(String data) {
+        olNumber = new int[]{1};
         sourceList.add(data);
         notifyItemInserted(sourceList.size() - 1);
     }

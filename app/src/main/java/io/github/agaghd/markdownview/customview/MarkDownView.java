@@ -20,13 +20,11 @@ public class MarkDownView extends RecyclerView {
     private MarkDownAdapter markDownAdapter;
 
     public MarkDownView(Context context) {
-        super(context);
-        init();
+      this(context,null);
     }
 
     public MarkDownView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        init();
+       this(context,attrs,0);
     }
 
     public MarkDownView(Context context, @Nullable AttributeSet attrs, int defStyle) {
