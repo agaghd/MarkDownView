@@ -40,7 +40,7 @@ public class MarkDown {
         /**
          * MarkDown 斜体正则
          */
-        public static final Pattern ITALIC = Pattern.compile("\\*[^\\*]+\\*$");
+        public static final Pattern ITALIC = Pattern.compile("[^\\*]{0}\\*[^\\*]+\\*[^\\*]{0}");
 
         /**
          * MarkDown 粗体正则
@@ -136,9 +136,9 @@ public class MarkDown {
                 spannableStringBuilder.append(sourceStr);
             }
             //解析所有粗体文字
-            setItalicSpannableString(spannableStringBuilder);
-            //解析所有斜体文字
             setBoldSpannableString(spannableStringBuilder);
+            //解析所有斜体文字
+            setItalicSpannableString(spannableStringBuilder);
             //解析所有超链接
             setHyperLinkSpannableString(spannableStringBuilder);
             //解析所有图片
@@ -163,6 +163,9 @@ public class MarkDown {
         spannableStringBuilder.append(sourceStr);
         RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(proportion);
         spannableStringBuilder.setSpan(relativeSizeSpan, 0, sourceStr.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        //标题都是粗体
+        StyleSpan hBoldStyle = new StyleSpan(Typeface.BOLD);
+        spannableStringBuilder.setSpan(hBoldStyle, 0, sourceStr.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     /**
@@ -194,7 +197,7 @@ public class MarkDown {
      * @param spannableStringBuilder 保存修改样式的spannablestring
      */
     private static void setItalicSpannableString(SpannableStringBuilder spannableStringBuilder) {
-        //TODO 解析所有斜体文字
+        //解析所有斜体文字
         String sourceStr = spannableStringBuilder.toString();
         Matcher matcher = Patterns.ITALIC.matcher(sourceStr);
         while (matcher.find()) {
@@ -203,8 +206,8 @@ public class MarkDown {
             int end = start + italicStr.length();
             StyleSpan italicSpan = new StyleSpan(Typeface.ITALIC);
             spannableStringBuilder.setSpan(italicSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannableStringBuilder.replace(start, start + 1, "");
-            spannableStringBuilder.replace(end - 1, end, "");
+            spannableStringBuilder.replace(start, end, spannableStringBuilder.subSequence(start + 1, end - 1));
+            sourceStr = spannableStringBuilder.toString();
         }
     }
 
@@ -214,7 +217,18 @@ public class MarkDown {
      * @param spannableStringBuilder 保存修改样式的spannablestring
      */
     private static void setBoldSpannableString(SpannableStringBuilder spannableStringBuilder) {
-        //TODO 解析所有粗体文字
+        //解析所有粗体文字
+        String sourceStr = spannableStringBuilder.toString();
+        Matcher matcher = Patterns.BOLD.matcher(sourceStr);
+        while (matcher.find()) {
+            String boldStr = matcher.group();
+            int start = sourceStr.indexOf(boldStr);
+            int end = start + boldStr.length();
+            StyleSpan boldStyle = new StyleSpan(Typeface.BOLD);
+            spannableStringBuilder.setSpan(boldStyle, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableStringBuilder.replace(start, end, spannableStringBuilder.subSequence(start + 2, end - 2));
+            sourceStr = spannableStringBuilder.toString();
+        }
     }
 
     /**
