@@ -2,6 +2,9 @@
     <string name="app_name">MarkDownView</string>
     <string name="btn1_text">解析source.md</string>
     <string name="btn2_text">自定义测试输入</string>
-    <string name="btn_parse">解析输入的MarkDown语句</string>
-    <string name="markdown_et_hint">请输入要解析的MarkDown语句</string>
+    <string name="btn_parse">解析</string>
+    <string name="btn_clear">清空</string>
+    <string name="markdown_et_hint">解析MarkDown语句</string>
+    <string name="markdown_et_test">#一级标题\n##二级标题\n###三级标题\n#一级标题嵌套*斜体*\n##二级标题嵌套[超链接](https://github.com/agaghd)\n###三级标题嵌套[*斜体超链接*](https://github.com/agaghd)\n##二级标题嵌套![**我的头像加粗**](https://avatars1.githubusercontent.com/u/16527638?s=460&amp;v=4)\n\n1. 有序列表1\n2. *有序列表2斜体*\n3. **有序列表3粗体**\n\n- 无序列表1\n- *无序列表2斜体* 部分\n- **无序列表3粗体** 部分**加粗**\n
+    </string>
 </resources>

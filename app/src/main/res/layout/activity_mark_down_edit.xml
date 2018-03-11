@@ -9,6 +9,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:orientation="vertical">
 
         <EditText
@@ -19,13 +21,30 @@
             android:hint="@string/markdown_et_hint"
             android:minHeight="150dp" />
 
-
-        <Button
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="parse"
-            android:text="@string/btn_parse"
-            android:textAllCaps="false" />
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="clear"
+                android:text="@string/btn_clear"
+                android:textAllCaps="false" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="parse"
+                android:text="@string/btn_parse"
+                android:textAllCaps="false" />
+
+        </LinearLayout>
+
+
     </LinearLayout>
 
 

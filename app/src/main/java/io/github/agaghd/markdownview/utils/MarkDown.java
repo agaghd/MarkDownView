@@ -231,6 +231,7 @@ public class MarkDown {
             int end = start + italicStr.length();
             StyleSpan italicSpan = new StyleSpan(Typeface.ITALIC);
             spannableStringBuilder.setSpan(italicSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            //将左右两边的*删掉
             spannableStringBuilder.replace(start, end, spannableStringBuilder.subSequence(start + 1, end - 1));
             sourceStr = spannableStringBuilder.toString();
         }
@@ -251,6 +252,7 @@ public class MarkDown {
             int end = start + boldStr.length();
             StyleSpan boldStyle = new StyleSpan(Typeface.BOLD);
             spannableStringBuilder.setSpan(boldStyle, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            //将左右两边的*删掉
             spannableStringBuilder.replace(start, end, spannableStringBuilder.subSequence(start + 2, end - 2));
             sourceStr = spannableStringBuilder.toString();
         }
@@ -270,11 +272,12 @@ public class MarkDown {
             int start = sourceStr.indexOf(hyperLinkStr);
             int end = start + hyperLinkStr.length();
             int urlStart = 0;
+            //找出Url并设置可点击
             String url = "";
             Matcher urlMatcher = Patterns.URL.matcher(hyperLinkStr);
             if (urlMatcher.find()) {
                 url = urlMatcher.group();
-                urlStart = hyperLinkStr.indexOf(url);
+                urlStart = sourceStr.indexOf(url);
             }
             final String finalUrl = url.length() > 2 ? url.substring(1, url.length() - 1) : "";
             ClickableSpan clickableSpan = new ClickableSpan() {
@@ -286,6 +289,7 @@ public class MarkDown {
                 }
             };
             spannableStringBuilder.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            //删掉中括号和小括号Url部分
             spannableStringBuilder.replace(urlStart, end, "");
             spannableStringBuilder.replace(urlStart - 1, urlStart, "");
             spannableStringBuilder.replace(start, start + 1, "");
@@ -307,11 +311,12 @@ public class MarkDown {
             int start = sourceStr.indexOf(hyperLinkStr);
             int end = start + hyperLinkStr.length();
             int urlStart = 0;
+            //找出Url并设置可点击
             String url = "";
             Matcher urlMatcher = Patterns.URL.matcher(hyperLinkStr);
             if (urlMatcher.find()) {
                 url = urlMatcher.group();
-                urlStart = hyperLinkStr.indexOf(url);
+                urlStart = sourceStr.indexOf(url);
             }
             final String finalUrl = url.length() > 3 ? url.substring(1, url.length() - 1) : "";
             ClickableSpan clickableSpan = new ClickableSpan() {
@@ -324,16 +329,18 @@ public class MarkDown {
             };
             String imageStr = sourceStr.substring(start + 2, urlStart - 1);
             spannableStringBuilder.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            //删除感叹号、中括号和小括号Url部分
             spannableStringBuilder.replace(urlStart, end, "");
             spannableStringBuilder.replace(urlStart - 1, urlStart, "");
             spannableStringBuilder.replace(start, start + 2, "");
             sourceStr = spannableStringBuilder.toString();
-            final int imageStrStart = sourceStr.indexOf(sourceStr);
+            final int imageStrStart = sourceStr.indexOf(imageStr);
             final int imageStrEnd = imageStrStart + imageStr.length();
             SimpleTarget<Bitmap> simpleTarget = new SimpleTarget<Bitmap>() {
                 @Override
                 public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                     if (resource != null) {
+                        //压缩图片的操作可能较为耗时，放在子线程做
                         AsyncTask<Object, Integer, Bitmap> asyncTask = new AsyncTask<Object, Integer, Bitmap>() {
 
                             int maxWidth = 0;
@@ -362,6 +369,7 @@ public class MarkDown {
                     }
                 }
             };
+            //使用Glide加载图片
             Glide.with(targetTv.getContext())
                     .load(finalUrl)
                     .asBitmap()
