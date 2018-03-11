@@ -31,6 +31,9 @@ import java.util.regex.Pattern;
 
 public class MarkDown {
 
+    /**
+     * 解析需要的所有正则表达式
+     */
     public static class Patterns {
         /**
          * MarkDown 1~3级标题正则
@@ -78,6 +81,9 @@ public class MarkDown {
         }
     }
 
+    /**
+     * 各类MarkDown语句的分类,使用int值表示
+     */
     public static class Statement {
         /**
          * MarkDown 1~3级标题
@@ -124,9 +130,10 @@ public class MarkDown {
      * 解析MarkDown语句，将结果显示在targetTv上
      * 先先解析作用于整行的类型，再解析每行中的元素
      *
-     * @param sourceStr 源文字字符串
-     * @param targetTv  目标TextView
-     * @param olNumber  有序列表的起始值
+     * @param sourceStr   源文字字符串
+     * @param targetTv    目标TextView
+     * @param olNumber    有序列表的起始值
+     * @param olNumberMap 保存有序列表每条对应的索引，避免因Recyclerview Item复用时导致序号混乱
      */
     public static void setMarkDownText(String sourceStr, TextView targetTv, int[] olNumber, Map<String, Integer> olNumberMap) {
         //解析MarkDown语句，将结果显示在targetTv上

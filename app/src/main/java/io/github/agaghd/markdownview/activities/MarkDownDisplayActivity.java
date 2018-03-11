@@ -20,7 +20,7 @@ import io.github.agaghd.markdownview.customview.MarkDownView;
 /**
  * author   :   wjy
  * time     :   2018/3/9
- * desc     :   解析source.md并显示的页面
+ * desc     :   显示的页面
  */
 public class MarkDownDisplayActivity extends AppCompatActivity {
 
@@ -30,19 +30,17 @@ public class MarkDownDisplayActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_source_dot_md_display);
-        viewInit();
+        markDownView = (MarkDownView) findViewById(R.id.mark_down_view);
         Intent intent = getIntent();
         boolean isParseSourceDotMD = intent.getBooleanExtra("isParseSourceDotMD", false);
         if (isParseSourceDotMD) {
+            //解析source.md的内容并显示
             parseSourceDotMD();
         } else {
+            //如果不是是要解析source.md，就解析传过来的content的内容并显示
             String content = intent.getStringExtra("content");
             parseInputMarkDownText(content);
         }
-    }
-
-    private void viewInit() {
-        markDownView = (MarkDownView) findViewById(R.id.mark_down_view);
     }
 
     private void parseSourceDotMD() {

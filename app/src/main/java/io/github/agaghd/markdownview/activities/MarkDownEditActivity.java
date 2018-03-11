@@ -8,6 +8,11 @@ import android.widget.EditText;
 
 import io.github.agaghd.markdownview.R;
 
+/**
+ * author : wjy
+ * time   : 2018/03/09
+ * desc   : 测试自定义输入MarkDown语句的页面
+ */
 public class MarkDownEditActivity extends AppCompatActivity {
 
     private EditText markDownEt;

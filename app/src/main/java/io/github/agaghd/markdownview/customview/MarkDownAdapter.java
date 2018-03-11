@@ -19,14 +19,14 @@ import io.github.agaghd.markdownview.utils.MarkDown;
 /**
  * author : wjy
  * time   : 2018/03/09
- * desc   : 显示markdown使用的适配器
+ * desc   : MarkDownView使用的适配器
  */
 @SuppressLint("UseSparseArrays")
 public class MarkDownAdapter extends RecyclerView.Adapter<MarkDownAdapter.MarkDownAdapterViewHolder> {
 
     private List<String> sourceList;//数据来源：markDown语句字符串
     private int[] olNumber;//有序列表的序号, 基本类型不能传递引用，所以使用数组
-    private Map<String, Integer> olNumberMap;//保存序列号的散列表,避免在item复用是造成有序列表序列号的混乱
+    private Map<String, Integer> olNumberMap;//保存序号的散列表,避免在item复用是造成有序列表序号的混乱
 
 
     public MarkDownAdapter() {
