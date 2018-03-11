@@ -25,7 +25,10 @@ public class PictureUtil {
     @WorkerThread
     public static Bitmap compressBitmapByWidth(
             @NonNull Bitmap bitmap,
-            @IntRange(from = 1, to = Integer.MAX_VALUE) int maxWidth) {
+            @IntRange(from = 0, to = Integer.MAX_VALUE) int maxWidth) {
+        if (maxWidth == 0) {
+            return bitmap;
+        }
         int width = bitmap.getWidth();
         if (width <= maxWidth) {
             return bitmap;

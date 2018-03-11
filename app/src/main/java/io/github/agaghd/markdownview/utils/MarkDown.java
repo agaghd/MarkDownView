@@ -1,13 +1,25 @@
 package io.github.agaghd.markdownview.utils;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.ClickableSpan;
+import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.view.View;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,7 +47,7 @@ public class MarkDown {
         /**
          * MarkDown 超链接正则
          */
-        public static final Pattern HYPER_LINK = Pattern.compile("\\[.*\\]\\(.*\\)");
+        public static final Pattern HYPER_LINK = Pattern.compile("[^!]{0}\\[.*\\]\\(.*\\)");
 
         /**
          * MarkDown 斜体正则
@@ -60,7 +72,7 @@ public class MarkDown {
         /**
          * MarkDown 图片和超链接URL的简单正则
          */
-        public static final Pattern URL = Pattern.compile("\\(.*\\)");
+        public static final Pattern URL = Pattern.compile("[^(]{0}\\(.*\\)$");
 
         private Patterns() {
         }
@@ -116,8 +128,8 @@ public class MarkDown {
      * @param targetTv  目标TextView
      * @param olNumber  有序列表的起始值
      */
-    public static void setMarkDownText(String sourceStr, TextView targetTv, int[] olNumber) {
-        // TODO: 2018/3/9 解析MarkDown语句，将结果显示在targetTv上
+    public static void setMarkDownText(String sourceStr, TextView targetTv, int[] olNumber, Map<String, Integer> olNumberMap) {
+        //解析MarkDown语句，将结果显示在targetTv上
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
         if (!TextUtils.isEmpty(sourceStr)) {
             //先解析作用于整行的类型，如1~3级标题，有序列表和无序列表, 有序列表以外作用于整行的类型会重置有序列表的起始值
@@ -131,6 +143,9 @@ public class MarkDown {
                 setHSpannableString(Statement.H3, sourceStr, spannableStringBuilder);
                 olNumber[0] = 1;
             } else if (Patterns.OL.matcher(sourceStr).matches()) {
+                int ol = olNumberMap.containsKey(sourceStr) ? olNumberMap.get(sourceStr) : olNumber[0];
+                olNumber[0] = ol;
+                olNumberMap.put(sourceStr, ol);
                 setOlSpannableString(sourceStr, spannableStringBuilder, olNumber);
                 //有序列表索引自增
                 olNumber[0]++;
@@ -144,12 +159,13 @@ public class MarkDown {
             setBoldSpannableString(spannableStringBuilder);
             //解析所有斜体文字
             setItalicSpannableString(spannableStringBuilder);
+            //解析所有图片
+            setImageSpannableString(spannableStringBuilder, targetTv);
             //解析所有超链接
             setHyperLinkSpannableString(spannableStringBuilder);
-            //解析所有图片
-            setImageSpannableString(spannableStringBuilder);
-            //TODO 用于测试，完成上述所有方法后这句删除
             targetTv.setText(spannableStringBuilder);
+            //使clickspan点击生效
+            targetTv.setMovementMethod(ClickOnlyMovementMethod.getInstance());
         } else {
             targetTv.setText(spannableStringBuilder);
         }
@@ -157,12 +173,14 @@ public class MarkDown {
 
     /**
      * 处理1~3级标题的方法
+     * 字体加粗，字号根据标题级别放大
      *
      * @param statement              MarkDown语句所属的类型
      * @param sourceStr              源字符串
      * @param spannableStringBuilder 保存修改样式的spannablestring
      */
     private static void setHSpannableString(int statement, String sourceStr, SpannableStringBuilder spannableStringBuilder) {
+        //计算标题内容的字号相对大小
         float proportion = 2 - statement / 4f;
         sourceStr = sourceStr.substring(statement, sourceStr.length()).trim();
         spannableStringBuilder.append(sourceStr);
@@ -175,6 +193,7 @@ public class MarkDown {
 
     /**
      * 处理有序列表的方法
+     * 内容 = 序号 + .+ 空格 + 列表内容.trim()
      *
      * @param sourceStr              源字符串
      * @param spannableStringBuilder 保存修改样式的spannablestring
@@ -187,6 +206,7 @@ public class MarkDown {
 
     /**
      * 处理无序列表的方法
+     * 内容 = ● + 空格 + 列表内容.trim()
      *
      * @param sourceStr              源字符串
      * @param spannableStringBuilder 保存修改样式的spannablestring
@@ -242,7 +262,35 @@ public class MarkDown {
      * @param spannableStringBuilder 保存修改样式的spannablestring
      */
     private static void setHyperLinkSpannableString(SpannableStringBuilder spannableStringBuilder) {
-        //TODO 解析所有超链接
+        //解析所有超链接
+        String sourceStr = spannableStringBuilder.toString();
+        Matcher matcher = Patterns.HYPER_LINK.matcher(sourceStr);
+        while (matcher.find()) {
+            String hyperLinkStr = matcher.group();
+            int start = sourceStr.indexOf(hyperLinkStr);
+            int end = start + hyperLinkStr.length();
+            int urlStart = 0;
+            String url = "";
+            Matcher urlMatcher = Patterns.URL.matcher(hyperLinkStr);
+            if (urlMatcher.find()) {
+                url = urlMatcher.group();
+                urlStart = hyperLinkStr.indexOf(url);
+            }
+            final String finalUrl = url.length() > 2 ? url.substring(1, url.length() - 1) : "";
+            ClickableSpan clickableSpan = new ClickableSpan() {
+                @Override
+                public void onClick(View widget) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(finalUrl));
+                    widget.getContext().startActivity(intent);
+                }
+            };
+            spannableStringBuilder.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableStringBuilder.replace(urlStart, end, "");
+            spannableStringBuilder.replace(urlStart - 1, urlStart, "");
+            spannableStringBuilder.replace(start, start + 1, "");
+            sourceStr = spannableStringBuilder.toString();
+        }
     }
 
     /**
@@ -250,10 +298,76 @@ public class MarkDown {
      *
      * @param spannableStringBuilder 保存修改样式的spannablestring
      */
-    private static void setImageSpannableString(SpannableStringBuilder spannableStringBuilder) {
-        //TODO 解析所有图片
-    }
+    private static void setImageSpannableString(final SpannableStringBuilder spannableStringBuilder, final TextView targetTv) {
+        // 解析所有图片
+        String sourceStr = spannableStringBuilder.toString();
+        Matcher matcher = Patterns.IMAGE.matcher(sourceStr);
+        while (matcher.find()) {
+            String hyperLinkStr = matcher.group();
+            int start = sourceStr.indexOf(hyperLinkStr);
+            int end = start + hyperLinkStr.length();
+            int urlStart = 0;
+            String url = "";
+            Matcher urlMatcher = Patterns.URL.matcher(hyperLinkStr);
+            if (urlMatcher.find()) {
+                url = urlMatcher.group();
+                urlStart = hyperLinkStr.indexOf(url);
+            }
+            final String finalUrl = url.length() > 3 ? url.substring(1, url.length() - 1) : "";
+            ClickableSpan clickableSpan = new ClickableSpan() {
+                @Override
+                public void onClick(View widget) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(finalUrl));
+                    widget.getContext().startActivity(intent);
+                }
+            };
+            String imageStr = sourceStr.substring(start + 2, urlStart - 1);
+            spannableStringBuilder.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableStringBuilder.replace(urlStart, end, "");
+            spannableStringBuilder.replace(urlStart - 1, urlStart, "");
+            spannableStringBuilder.replace(start, start + 2, "");
+            sourceStr = spannableStringBuilder.toString();
+            final int imageStrStart = sourceStr.indexOf(sourceStr);
+            final int imageStrEnd = imageStrStart + imageStr.length();
+            SimpleTarget<Bitmap> simpleTarget = new SimpleTarget<Bitmap>() {
+                @Override
+                public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                    if (resource != null) {
+                        AsyncTask<Object, Integer, Bitmap> asyncTask = new AsyncTask<Object, Integer, Bitmap>() {
 
+                            int maxWidth = 0;
+
+                            @Override
+                            protected void onPreExecute() {
+                                super.onPreExecute();
+                                maxWidth = targetTv.getContext().getResources().getDisplayMetrics().widthPixels;
+                            }
+
+                            @Override
+                            protected Bitmap doInBackground(Object... params) {
+                                return PictureUtil.compressBitmapByWidth(resource, maxWidth);
+                            }
+
+                            @Override
+                            protected void onPostExecute(Bitmap bitmap) {
+                                super.onPostExecute(bitmap);
+                                ImageSpan imageSpan = new ImageSpan(targetTv.getContext(), bitmap);
+                                spannableStringBuilder.setSpan(imageSpan, imageStrStart, imageStrEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                targetTv.setText(spannableStringBuilder);
+                                targetTv.setMovementMethod(ClickOnlyMovementMethod.getInstance());
+                            }
+                        };
+                        asyncTask.execute();
+                    }
+                }
+            };
+            Glide.with(targetTv.getContext())
+                    .load(finalUrl)
+                    .asBitmap()
+                    .into(simpleTarget);
+        }
+    }
 
     private MarkDown() {
 
