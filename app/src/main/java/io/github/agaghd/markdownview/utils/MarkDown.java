@@ -269,7 +269,7 @@ public class MarkDown {
                             @Override
                             protected void onPostExecute(Bitmap bitmap) {
                                 super.onPostExecute(bitmap);
-                                ImageSpan imageSpan = new ImageSpan(targetTv.getContext(), bitmap);
+                                ImageSpan imageSpan = new ImageSpan(targetTv.getContext(), bitmap,ImageSpan.ALIGN_BASELINE);
                                 spannableStringBuilder.setSpan(imageSpan, imageStrStart, imageStrEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                                 targetTv.setText(spannableStringBuilder);
                                 targetTv.setMovementMethod(ClickOnlyMovementMethod.getInstance());
