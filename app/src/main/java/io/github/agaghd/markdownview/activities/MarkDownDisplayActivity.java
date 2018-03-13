@@ -45,7 +45,7 @@ public class MarkDownDisplayActivity extends AppCompatActivity {
 
     private void parseSourceDotMD() {
         //解析source.md
-        AsyncTask<Object, Object, List<String>> asyncTask = new AsyncTask<Object, Object, List<String>>() {
+        AsyncTask<Object, String, List<String>> asyncTask = new AsyncTask<Object, String, List<String>>() {
 
             @Override
             protected List<String> doInBackground(Object... params) {
@@ -67,10 +67,7 @@ public class MarkDownDisplayActivity extends AppCompatActivity {
                             reader.close();
                         } catch (IOException e) {
                             e.printStackTrace();
-                            Toast.makeText(
-                                    MarkDownDisplayActivity.this,
-                                    "读取sorce.md出现错误：" + e.getMessage(),
-                                    Toast.LENGTH_LONG).show();
+                            publishProgress("读取sorce.md出现错误：" + e.getMessage());
                         }
                     }
                     if (is != null) {
@@ -78,14 +75,20 @@ public class MarkDownDisplayActivity extends AppCompatActivity {
                             is.close();
                         } catch (IOException e) {
                             e.printStackTrace();
-                            Toast.makeText(
-                                    MarkDownDisplayActivity.this,
-                                    "读取sorce.md出现错误：" + e.getMessage(),
-                                    Toast.LENGTH_LONG).show();
+                            publishProgress("读取sorce.md出现错误：" + e.getMessage());
                         }
                     }
                 }
                 return data;
+            }
+
+            @Override
+            protected void onProgressUpdate(String... values) {
+                super.onProgressUpdate(values);
+                //发现错误，在这里弹Toast
+                for (String e : values) {
+                    Toast.makeText(MarkDownDisplayActivity.this, e, Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override
