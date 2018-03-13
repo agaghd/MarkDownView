@@ -61,6 +61,7 @@ public class MarkDownDisplayActivity extends AppCompatActivity {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                    publishProgress("读取sorce.md出现错误：" + e.getMessage());
                 } finally {
                     if (reader != null) {
                         try {
